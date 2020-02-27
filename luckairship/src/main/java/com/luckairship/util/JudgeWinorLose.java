@@ -2,6 +2,7 @@ package com.luckairship.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -30,13 +31,20 @@ public class JudgeWinorLose {
 			bigSmall.put(String.valueOf(i), biStr);
 			i++;
 		}
+
+		try {
+			updateMariaDB(openPeriod, bigSmall);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println(bigSmall);
 		System.out.println(singularMap);
 		return null;
 
 	}
 
-	public static void updateMariaDB(String onlypid, int period, int betResult, int bet_number) throws SQLException {
+	public static void updateMariaDB(String openPeriod, HashMap<String, String> bigSmall) throws SQLException {
 		System.out.println("start connect");
 		String conn_str = "jdbc:mysql://45.32.49.87:3306/luckairship?" + "user=mike&password=mike123"
 				+ "&useUnicode=true&characterEncoding=UTF8";
@@ -44,19 +52,28 @@ public class JudgeWinorLose {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(conn_str);
 			Statement stmt = conn.createStatement();
-			SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd");// dd/MM/yyyy
+
 			Date now = new Date();
-			String strDate = sdfDate.format(now);
+
 			SimpleDateFormat sqlDate = new SimpleDateFormat("yyyy-MM-dd");// dd/MM/yyyy
 			String sqD = sqlDate.format(now);
-			System.out.println("現在時間:" + strDate);
-			onlypid = strDate + onlypid;
+			int pid = Integer.valueOf(openPeriod);
+			for (int i = 1; i <= 10; i++) {
+				String sql = "SELECT * FROM bet_order WHERE  IDENTIFICATION_PERIODS = '" + pid + "' AND BET_NUMBER = "
+						+ i + " AND CREATE_DATE = '" + sqD + "'";
+				System.out.println("打印SQL:" + sql);
+				ResultSet rs = stmt.executeQuery(sql);
 
-			String sql = "INSERT INTO bet_order (`PERIOD`, `BET_RESULT`, `BET_NUMBER`, `CREATE_DATE` , `IDENTIFICATION_PERIODS`) VALUES ('"
-					+ onlypid + "', '" + betResult + "', '" + bet_number + "', '" + sqD + "','" + period
-					+ "') ON DUPLICATE KEY UPDATE BET_RESULT = '" + betResult + "';";
-			int execode = stmt.executeUpdate(sql);
+				String sqlpidResult = "";
+				while (rs.next()) {
+					sqlpidResult = rs.getString(3);
+				}
+				String result = bigSmall.get(String.valueOf(i)).equals("大") ? "1" : "2";
+				if (!sqlpidResult.equals(result) && !sqlpidResult.isEmpty()) {
 
+				}
+
+			}
 			System.out.println("MariaDB/MySQL connect success");
 		} catch (Exception e) {
 			System.out.println("錯誤:" + e);
