@@ -286,6 +286,7 @@ public class LuckAirShipScan {
 		JLabel lblryan = new JLabel("此版本 V1.0.0.0");
 		lblryan.setBounds(448, 407, 122, 15);
 		frame.getContentPane().add(lblryan);
+		
 		textArea.setBounds(118, 265, 349, 93);
 		frame.getContentPane().add(textArea);
 

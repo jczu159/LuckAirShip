@@ -47,6 +47,17 @@ public class AirShipCollectData {
 			br = new BufferedReader(new FileReader("C:/Users/IMI-JAVA-Ryan/Documents/202006.txt"));
 
 			while ((str = br.readLine()) != null) {
+
+				if (str.contains("期开奖号码")) {
+					// System.out.println("最新开奖号码结果:" + str.toString());
+					String openPid = str.substring(str.toString().indexOf("第") + 1, str.toString().indexOf("期开奖号码"));
+					String newLottyNumber = str.substring(str.toString().indexOf("：") + 1, str.length());
+					// 开奖结果
+					String numbersp[] = newLottyNumber.split(" ");
+					JudgeWinorLose.JudgeBigSmall(numbersp, openPid);
+					System.out.println(numbersp.toString());
+				}
+
 				// System.out.println("显示数据 :" + str.toString());
 				if (str.contains("期") && str.contains("彩票GG")) {
 					if (str.contains("冠军大小")) {
@@ -167,7 +178,7 @@ public class AirShipCollectData {
 			String sqD = sqlDate.format(now);
 			System.out.println("現在時間:" + strDate);
 			onlypid = strDate + onlypid;
-			
+
 			String sql = "INSERT INTO bet_order (`PERIOD`, `BET_RESULT`, `BET_NUMBER`, `CREATE_DATE` , `IDENTIFICATION_PERIODS`) VALUES ('"
 					+ onlypid + "', '" + betResult + "', '" + bet_number + "', '" + sqD + "','" + period
 					+ "') ON DUPLICATE KEY UPDATE BET_RESULT = '" + betResult + "';";
